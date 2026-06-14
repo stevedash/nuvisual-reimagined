@@ -150,6 +150,7 @@ img,video{display:block;max-width:100%}
   display:none;width:42px;height:42px;flex-shrink:0;cursor:pointer;
   border:none;background:transparent;padding:0;border-radius:10px;
   flex-direction:column;align-items:center;justify-content:center;gap:5px;
+  touch-action:manipulation;-webkit-tap-highlight-color:transparent;
 }
 .burger span{display:block;width:22px;height:2px;border-radius:2px;background:#181d27;transition:transform .3s ease,opacity .25s ease}
 #nav.menu-open .burger span:nth-child(1){transform:translateY(7px) rotate(45deg)}
@@ -349,6 +350,7 @@ section{position:relative;z-index:1}
 .band{
   position:relative;border-radius:18px;overflow:hidden;height:62vh;min-height:420px;
   border:1px solid var(--line);
+  background:linear-gradient(160deg,#06222e,#02050a);
 }
 .band .media{position:absolute;inset:-12% 0;background:url('https://nuvisualmedia.com/wp-content/uploads/2024/09/video-covervideo-cover-v1.jpg') center/cover no-repeat;will-change:transform}
 .band .scrim{position:absolute;inset:0;background:linear-gradient(to top,rgba(1,4,10,.85),rgba(1,4,10,.15) 55%)}
@@ -374,8 +376,10 @@ section{position:relative;z-index:1}
   display:flex;flex-direction:column;
 }
 .voice:hover{transform:translateY(-5px);border-color:rgba(0,178,227,.5)}
-.voice .vid{aspect-ratio:16/9;background:#0a121c;position:relative}
-.voice .vid iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.voice .vid{aspect-ratio:16/9;background:#0a121c;position:relative;overflow:hidden}
+.voice .vid .poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
+.voice .vid iframe{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:2;opacity:0;transition:opacity .45s ease}
+.voice .vid iframe.ready{opacity:1}
 .voice .body{padding:26px 26px 30px;display:flex;flex-direction:column;gap:16px;flex:1}
 .voice blockquote{
   font-weight:300;line-height:1.7;color:#d7dde3;font-size:15px;flex:1;
@@ -592,21 +596,21 @@ footer ul a:hover{color:var(--cyan-soft)}
     <h2 class="h2 serif reveal" style="text-align:center" data-text-plain="Our Client Testimonials"></h2>
     <div class="voice-grid">
       <div class="voice reveal">
-        <div class="vid"><iframe data-src="https://player.vimeo.com/video/1035348129?h=fb401b1d9d&dnt=1" title="Francine Testimonial" loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div>
+        <div class="vid"><img class="poster" src="voice-thumb-1.jpg" alt=""><iframe data-src="https://player.vimeo.com/video/1035348129?h=fb401b1d9d&dnt=1" title="Francine Testimonial" loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div>
         <div class="body">
           <blockquote>The work Nu Visual Media has done for us has had great impact — impact we've measured in our analytics, particularly on social media.</blockquote>
           <div class="who"><b>Francine Charles</b><span>Programme Manager · Heart &amp; Stroke Foundation Barbados</span></div>
         </div>
       </div>
       <div class="voice reveal" style="--d:.12s">
-        <div class="vid"><iframe data-src="https://player.vimeo.com/video/1035348174?h=205e7a97c0&dnt=1" title="Paula Testimonial" loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div>
+        <div class="vid"><img class="poster" src="voice-thumb-2.jpg" alt=""><iframe data-src="https://player.vimeo.com/video/1035348174?h=205e7a97c0&dnt=1" title="Paula Testimonial" loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div>
         <div class="body">
           <blockquote>Because they are so honest about timelines, I know that once they commit to our project we will hit them — and execute at a high level.</blockquote>
           <div class="who"><b>Paula Walcott</b><span>Chief People Officer · Sagicor Financial Company Ltd.</span></div>
         </div>
       </div>
       <div class="voice reveal" style="--d:.24s">
-        <div class="vid"><iframe data-src="https://player.vimeo.com/video/1035348222?h=757ec65481&dnt=1" title="JoEllen Testimonial" loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div>
+        <div class="vid"><img class="poster" src="voice-thumb-3.jpg" alt=""><iframe data-src="https://player.vimeo.com/video/1035348222?h=757ec65481&dnt=1" title="JoEllen Testimonial" loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div>
         <div class="body">
           <blockquote>They present the agency, and what we're doing, to a high international standard of production.</blockquote>
           <div class="who"><b>JoEllen Laryea</b><span>Manager (Ag) · Caribbean Export Development Agency</span></div>
@@ -829,11 +833,12 @@ footer ul a:hover{color:var(--cyan-soft)}
     entries.forEach(function(e){
       if (e.isIntersecting){
         var f = e.target;
+        f.addEventListener('load', function(){ f.classList.add('ready'); });
         f.src = f.getAttribute('data-src');
         vio.unobserve(f);
       }
     });
-  }, {rootMargin: '300px'});
+  }, {rootMargin: '1200px'});
   document.querySelectorAll('iframe[data-src]').forEach(function(f){ vio.observe(f); });
 
   /* ---------- nav scroll state + rail + parallax ---------- */
