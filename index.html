@@ -90,9 +90,9 @@ img,video{display:block;max-width:100%}
 #loader .bar i{display:block;height:100%;width:0;background:var(--cyan);transition:width .25s ease}
 
 /* ---------- ambient glow ---------- */
-.nebula{position:fixed;border-radius:50%;filter:blur(110px);pointer-events:none;z-index:0;opacity:.5}
-.nebula.a{width:55vw;height:55vw;left:-18vw;top:18vh;background:radial-gradient(circle,rgba(0,178,227,.16),transparent 65%)}
-.nebula.b{width:46vw;height:46vw;right:-14vw;top:64vh;background:radial-gradient(circle,rgba(98,209,229,.10),transparent 65%)}
+.nebula{position:fixed;border-radius:50%;pointer-events:none;z-index:0;opacity:.5}
+.nebula.a{width:60vw;height:60vw;left:-20vw;top:16vh;background:radial-gradient(circle,rgba(0,178,227,.16),rgba(0,178,227,.05) 38%,transparent 72%)}
+.nebula.b{width:50vw;height:50vw;right:-16vw;top:62vh;background:radial-gradient(circle,rgba(98,209,229,.10),rgba(98,209,229,.03) 38%,transparent 72%)}
 
 /* ---------- nav ---------- */
 #nav{
@@ -137,12 +137,12 @@ img,video{display:block;max-width:100%}
 #nav .btn:hover{background:#15191f;transform:translateY(-1px)}
 /* ---- mobile burger + dropdown ---- */
 .burger{
-  display:none;width:42px;height:42px;flex-shrink:0;cursor:pointer;
+  display:none;width:44px;height:44px;flex-shrink:0;cursor:pointer;
   border:none;background:transparent;padding:0;border-radius:10px;
   flex-direction:column;align-items:center;justify-content:center;gap:5px;
   touch-action:manipulation;-webkit-tap-highlight-color:transparent;
 }
-.burger span{display:block;width:22px;height:2px;border-radius:2px;background:#181d27;transition:transform .3s ease,opacity .25s ease}
+.burger span{display:block;width:22px;height:2px;border-radius:2px;background:#181d27;transition:transform .3s ease,opacity .25s ease;pointer-events:none}
 #nav.menu-open .burger span:nth-child(1){transform:translateY(7px) rotate(45deg)}
 #nav.menu-open .burger span:nth-child(2){opacity:0}
 #nav.menu-open .burger span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
@@ -884,14 +884,19 @@ footer ul a:hover{color:var(--cyan-soft)}
   /* ---------- mobile burger menu ---------- */
   var burger = document.querySelector('.burger');
   if (burger){
-    burger.addEventListener('click', function(){
-      var open = nav.classList.toggle('menu-open');
-      burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    var setMenu = function(open){ nav.classList.toggle('menu-open', open); burger.setAttribute('aria-expanded', open ? 'true' : 'false'); };
+    var toggleMenu = function(){ setMenu(!nav.classList.contains('menu-open')); };
+    var lastTouch = 0;
+    /* touch: act on pointerup for instant, reliable activation on iOS Safari */
+    burger.addEventListener('pointerup', function(e){
+      if (e.pointerType === 'touch' || e.pointerType === 'pen'){ e.preventDefault(); lastTouch = Date.now(); toggleMenu(); }
     });
+    /* mouse + keyboard use click; ignore the ghost click that trails a touch */
+    burger.addEventListener('click', function(){ if (Date.now() - lastTouch < 600) return; toggleMenu(); });
     document.querySelectorAll('.mobile-menu a').forEach(function(a){
-      a.addEventListener('click', function(){ nav.classList.remove('menu-open'); burger.setAttribute('aria-expanded', 'false'); });
+      a.addEventListener('click', function(){ setMenu(false); });
     });
-    window.addEventListener('resize', function(){ if (window.innerWidth >= 768){ nav.classList.remove('menu-open'); burger.setAttribute('aria-expanded', 'false'); } });
+    window.addEventListener('resize', function(){ if (window.innerWidth >= 768) setMenu(false); });
   }
 })();
 </script>
